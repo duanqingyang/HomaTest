@@ -1,5 +1,5 @@
 """
-Reserve an entire chassis worth of m510 machines for RAMCloud Homa evaluation.
+Use m510 machines to evaluate RAMCloud Homa implementation.
 """
 
 import geni.portal as portal
