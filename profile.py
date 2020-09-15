@@ -15,6 +15,8 @@ types  = [ ("m510", "m510 (Intel Xeon-D)")]
 
 chassis = range(1,13+1)
 
+nodesNum = range(3,45+1)
+
 pc.defineParameter("image", "Disk Image",
                    portal.ParameterType.IMAGE, images[0], images)
 
@@ -24,8 +26,8 @@ pc.defineParameter("type", "Node Type",
 pc.defineParameter("chassis", "Which chassis to request",
                    portal.ParameterType.INTEGER,1,chassis)
 
-pc.defineParameter("skip", "Comma-separated list of nodes to skip",
-                   portal.ParameterType.STRING,"")
+pc.defineParameter("nodesNum", "total number of nodes",
+                   portal.ParameterType.INTEGER,3,nodesNum)
 
 params = pc.bindParameters()
 
@@ -34,25 +36,17 @@ rspec = RSpec.Request()
 lan = RSpec.LAN()
 rspec.addResource(lan)
 
-skiplist = ["ms%02d%02d" % (params.chassis, int(x)) for x in params.skip.split(",") if x]
-
-nodes_per_chassis = 45
-num_nodes = nodes_per_chassis - len(skiplist)
+num_nodes = params.nodesNum
 
 rc_aliases = ["rcmaster", "rcnfs"]
 for i in range(num_nodes - 2):
     rc_aliases.append("rc%02d" % (i + 1))
 
-n = 0
-for i in range(nodes_per_chassis):
+for i in range(num_nodes):
     name = "ms%02d%02d" % (params.chassis, i + 1)
-
-    if name in skiplist:
-        continue
-
-    rc_alias = rc_aliases[n]
+    rc_alias = rc_aliases[i]
     node = RSpec.RawPC(rc_alias)
-    n = n + 1
+    
 
     if rc_alias == "rcnfs":
         # Ask for a 200GB file system mounted at /shome on rcnfs
@@ -63,8 +57,8 @@ for i in range(nodes_per_chassis):
     node.disk_image = urn.Image(cloudlab.Utah,"emulab-ops:%s" % params.image)
     node.component_id = urn.Node(cloudlab.Utah, name)
 
-    node.addService(RSpec.Execute(
-            shell="sh", command="sudo /local/repository/startup.sh"))
+    #node.addService(RSpec.Execute(
+    #        shell="sh", command="sudo /local/repository/startup.sh"))
 
     rspec.addResource(node)
 
