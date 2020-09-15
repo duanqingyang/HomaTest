@@ -27,7 +27,7 @@ pc.defineParameter("chassis", "Which chassis to request",
                    portal.ParameterType.INTEGER,1,chassis)
 
 pc.defineParameter("nodesNum", "total number of nodes",
-                   portal.ParameterType.INTEGER,3,nodesNum)
+                   portal.ParameterType.INTEGER,4,nodesNum)
 
 params = pc.bindParameters()
 
